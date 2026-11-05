@@ -23,7 +23,8 @@ jobs:
 
     - name: 4. Download APK dari Release
       run: |
-        wget "https://github.com/satsitsit/bongkar-apk/releases/download/v1/DeepCine_PREMIUM_V4.0.7.SFILE.MOBI_.apk" -O app.apk
+        # Link sudah diperbaiki sesuai screenshot kamu
+        wget "https://github.com/satsitsit/bongkar-apk/releases/download/v1/DeepCine.PREMIUM_V4.0.7.SFILE.MOBI.apk" -O app.apk
 
     - name: 5. Proses Decompile APK
       run: |
