@@ -23,23 +23,28 @@ jobs:
 
     - name: 4. Download APK dari Release
       run: |
-        # Link sudah diperbaiki sesuai screenshot kamu
         wget "https://github.com/satsitsit/bongkar-apk/releases/download/v1/DeepCine.PREMIUM_V4.0.7.SFILE.MOBI.apk" -O app.apk
 
     - name: 5. Proses Decompile APK
       run: |
         java -Xmx4g -cp jadx/lib/jadx-1.5.0-all.jar jadx.cli.JadxCLI -d hasil_bongkar app.apk
 
-    - name: 6. Cari URL API
+    - name: 6. CARI URL API (DEEP SCAN)
       run: |
-        echo "=== MENCARI URL VELVETREEL ==="
-        grep -rn "velvetreel.7nkznc.com" hasil_bongkar/ > hasil_url.txt || true
+        echo "=== 1. MENCARI URL VELVETREEL DI SEMUA FILE ==="
+        grep -rn "velvetreel" hasil_bongkar/ > hasil_url.txt || true
         
-        echo "=== MENCARI ENDPOINT PENTING ==="
-        grep -rniE "api/|/v1/|/v2/|search|movie|series" hasil_bongkar/ | grep -i "http" >> hasil_url.txt || true
+        echo "=== 2. MENCARI ENDPOINT RETROFIT (JAVA) ==="
+        grep -rniE "@GET|@POST|baseUrl|/api/" hasil_bongkar/sources/ | grep -iE "http|/v1/|/v2/" >> hasil_url.txt || true
+        
+        echo "=== 3. MENCARI ENDPOINT DI NATIVE LIB (.so) ==="
+        strings hasil_bongkar/resources/lib/arm64-v8a/*.so | grep -iE "http://|https://|/api/|/v1/|/v2/" | grep -v "applovin\|unity\|google\|facebook\|mossturbo\|pangle\|vungle" >> hasil_url.txt || true
+        
+        echo "=== 4. MENCARI DI ANDROID MANIFEST ==="
+        strings hasil_bongkar/AndroidManifest.xml | grep -iE "http|api" >> hasil_url.txt || true
         
         echo "--- HASIL AKHIR ---"
-        cat hasil_url.txt
+        cat hasil_url.txt | sort -u
 
     - name: 7. Simpan Hasil
       uses: actions/upload-artifact@v4
